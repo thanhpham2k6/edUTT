@@ -20,13 +20,12 @@ Dự án áp dụng mô hình **Git Flow rút gọn** gồm 2 nhánh dài hạn 
 - `feature/week1-docker-replica-set` (Phạm Văn Thanh)
 - `feature/week2-schema-design` (Bùi Văn Thắng)
 - `feature/week3-migrations-jsonschema` (Bùi Văn Thắng)
-- `feature/week4-qa-crud-api` (Nguyễn Hữu Trọng)
-- `feature/week4-jwt-rbac` (Phạm Văn Thanh)
+- `feature/week4-crud-and-rbac` (Vũ Quốc Doanh & Phạm Văn Thanh)
 - `feature/week5-aggregation-views-hooks` (Nguyễn Hữu Trọng)
 - `feature/week6-faker-seeding-benchmark` (Nguyễn Quang Lương)
 - `feature/week7-acid-transaction-vote` (Bùi Văn Thắng)
 - `feature/week8-react-ui` (Vũ Quốc Doanh)
-- `feature/week9-backup-restore-scripts` (Nguyễn Quang Lương)
+- `feature/week9-backup-restore-scripts` (Phạm Văn Thanh)
 
 ---
 

@@ -19,4 +19,4 @@ st.members.forEach(m => print(' -', m.name, '| State:', m.stateStr, '| Health:',
 "
 
 Write-Host "`n=== Chuỗi kết nối khuyến nghị ===" -ForegroundColor Cyan
-Write-Host "MONGO_URI=mongodb://localhost:27017/edutt_db?replicaSet=rs0" -ForegroundColor Yellow
+Write-Host "MONGO_URI=mongodb://localhost:27017/edutt?replicaSet=rs0" -ForegroundColor Yellow

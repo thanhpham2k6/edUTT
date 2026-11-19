@@ -2,21 +2,22 @@
 
 > **Đồ án học phần Cơ sở dữ liệu — Nhóm 1**  
 > **Trường Đại học Công nghệ Giao thông Vận tải (UTT)**  
-> **Đề tài 1:** Xây dựng nền tảng hỏi đáp học thuật và lưu trữ tri thức (edUTT)
+> **Đề tài 1:** Xây dựng nền tảng hỏi đáp học thuật và lưu trữ tri thức (edUTT)  
+> **Mô hình:** Cộng đồng sinh viên trao đổi học thuật lẫn nhau — Tập trung thiết kế & tối ưu CSDL MongoDB (10 tuần)
 
 ---
 
 ## 1. Tổng quan dự án
 
-**edUTT** là nền tảng hỏi đáp học thuật tập trung theo từng học phần của trường đại học, giúp sinh viên và giảng viên đặt câu hỏi, thảo luận, bình chọn câu trả lời chất lượng, chốt đáp án chuẩn và lưu trữ tài liệu học tập có kiểm duyệt.
+**edUTT** là nền tảng hỏi đáp học thuật theo mô hình **cộng đồng sinh viên tự hỗ trợ**, tập trung theo từng học phần của nhà trường. Sinh viên có thể đặt câu hỏi, bình luận ngắn, giải đáp lẫn nhau, bình chọn câu trả lời hữu ích, tự chốt đáp án chuẩn và chia sẻ tài liệu học tập có kiểm duyệt.
 
 ### Trọng tâm kỹ thuật Cơ sở dữ liệu (MongoDB)
-1. **Mô hình hóa dữ liệu NoSQL:** Phân định ranh giới **Embedding** (`short_comments`, `subject_tags`) và **Referencing** (`answers`, `documents`, `votes`).
-2. **Toàn vẹn dữ liệu ở nhân DB:** Áp đặt **`$jsonSchema` Validation** và **Unique / Compound Unique Index** thông qua `migrate-mongo`.
-3. **Truy vấn tổng hợp & Tự động hóa:** **Aggregation Pipeline**, **MongoDB Read-only Views** (`v_top_contributors`, `v_subject_knowledge_stats`) và **Mongoose Hooks**.
-4. **Tối ưu hiệu năng trên dữ liệu lớn:** Sinh **100.000 – 500.000 bản ghi** bằng `faker.js`, thiết kế **Weighted Text Index** & **Compound Index (ESR)**, đo benchmark `COLLSCAN` vs `IXSCAN` qua `explain("executionStats")`.
-5. **Xử lý đồng thời:** **Multi-document ACID Transaction** (`ClientSession`) cho luồng bình chọn (vote) và chốt đáp án chuẩn (accept answer) chống Race Condition.
-6. **Bảo mật & Vận hành:** Phân quyền **RBAC 2 lớp** (JWT API + MongoDB `readWrite`/`readOnly`) và sao lưu/phục hồi thảm họa bằng `mongodump` / `mongorestore`.
+1. **Mô hình hóa dữ liệu NoSQL (6 Collection):** Phân định ranh giới **Embedding** (`short_comments`, `subject_tags`) và **Referencing** (`answers`, `documents`, `votes`).
+2. **Toàn vẹn dữ liệu ở nhân DB:** Áp đặt **`$jsonSchema` Validation** (không để trống mục bắt buộc, `reputation >= 0`) và **Unique / Compound Unique Index** (chặn 1 sinh viên bình chọn nhiều lần cho 1 bài).
+3. **Truy vấn tổng hợp & Tự động hóa:** **Aggregation Pipeline**, 2 bảng thống kê tự động (**MongoDB Read-only Views**: `v_top_contributors`, `v_subject_knowledge_stats`), tự động chuẩn hóa tiếng Việt không dấu (`search_normalized`), tự động cộng điểm uy tín khi duyệt tài liệu và đồng bộ tên môn học bằng `updateMany()`.
+4. **Tối ưu hiệu năng trên dữ liệu lớn:** Sinh **100.000 – 500.000 bản ghi** giả lập, đánh **Weighted Text Index** & **Compound Index (ESR)**, đo đối chiếu `COLLSCAN` vs `IXSCAN` qua `explain("executionStats")`.
+5. **Xử lý đồng thời:** **Multi-document ACID Transaction** (`ClientSession`) khi nhiều sinh viên bấm bình chọn hoặc chốt đáp án cùng lúc.
+6. **Bảo mật & Vận hành:** Phân quyền **2 vai trò người dùng** (`STUDENT`, `ADMIN`) + **2 tài khoản CSDL MongoDB** (`edutt_app_rw`, `edutt_report_ro`) và sao lưu/phục hồi sự cố bằng `mongodump` / `mongorestore`.
 
 ---
 
@@ -40,7 +41,7 @@ edUTT/
 ├── .github/
 │   └── PULL_REQUEST_TEMPLATE.md     # Mẫu Pull Request cho quy trình review
 ├── docs/
-│   ├── 00-project-plan-and-team.md  # Phân công 5 thành viên & lộ trình 10 tuần
+│   ├── 00-project-plan-and-team.md  # Phân công 5 thành viên, tác nhân & lộ trình 10 tuần
 │   └── 01-system-requirements-specification.md  # Đặc tả yêu cầu hệ thống (Chương 1)
 ├── scripts/
 │   └── verify-replica-set.ps1       # Script kiểm tra trạng thái MongoDB Replica Set
@@ -51,7 +52,7 @@ edUTT/
 │   ├── src/
 │   │   ├── config/                  # Kết nối DB, biến môi trường
 │   │   ├── models/                  # Mongoose Schemas + Hooks
-│   │   ├── middlewares/             # JWT Auth & RBAC (student, lecturer, admin)
+│   │   ├── middlewares/             # JWT Auth & RBAC (STUDENT, ADMIN)
 │   │   ├── services/                # Nghiệp vụ chính + Multi-document ACID Transaction
 │   │   ├── controllers/             # Xử lý HTTP Request/Response
 │   │   └── routes/                  # Định tuyến REST API
@@ -89,7 +90,7 @@ MongoDB bắt buộc chạy ở chế độ **Replica Set** (có Oplog) mới h�
 docker compose up -d
 ```
 
-- **Chế độ cụm phân tán đầy đủ (3 node: 1 Primary, 2 Secondary — dùng khi demo hạ tầng):**
+- **Chế độ cụm đầy đủ (1 máy chủ chính Primary & 2 máy chủ dự phòng Secondary):**
 ```bash
 docker compose -f docker-compose.cluster.yml up -d
 ```
@@ -107,22 +108,22 @@ Kết quả hiển thị `state: 'PRIMARY'` là môi trường đã sẵn sàng.
 
 - **Chuỗi kết nối cho Backend & MongoDB Compass:**
   ```text
-  mongodb://localhost:27017/edutt_db?replicaSet=rs0
+  mongodb://localhost:27017/edutt?replicaSet=rs0
   ```
 
 ---
 
 ## 5. Nhóm thực hiện (Nhóm 1)
 
-| STT | Họ và tên | Vai trò & Phân hệ phụ trách |
+| STT | Họ và tên | Vai trò phụ trách (Trọng tâm CSDL) |
 | :-: | :--- | :--- |
-| 1 | **Phạm Văn Thanh** | Nhóm trưởng — Phân tích nghiệp vụ, Hạ tầng Docker & RBAC |
-| 2 | **Bùi Văn Thắng** | Thiết kế CSDL (6 Collection), Migration (`$jsonSchema`) & ACID Transaction |
-| 3 | **Nguyễn Hữu Trọng** | Backend REST API, Aggregation Pipeline, Views & Mongoose Hooks |
-| 4 | **Nguyễn Quang Lương** | Seeding 500.000 bản ghi (`faker.js`), Index Benchmark, Jest & Backup/Restore |
-| 5 | **Vũ Quốc Doanh** | Frontend React, Tích hợp API & Kịch bản Demo |
+| 1 | **Phạm Văn Thanh** | **Nhóm trưởng** — Cài đặt CSDL (Docker), Phân quyền (`edutt_app_rw`, `edutt_report_ro`) & Sao lưu/Phục hồi |
+| 2 | **Bùi Văn Thắng** | **Thiết kế cấu trúc CSDL & Xử lý giao dịch** — Sơ đồ 6 Collection, `$jsonSchema` & ACID Transaction |
+| 3 | **Nguyễn Hữu Trọng** | **Truy vấn thống kê & Tự động hóa CSDL** — 2 bảng Views, chuẩn hóa tiếng Việt không dấu, Hook uy tín & đồng bộ tên môn |
+| 4 | **Nguyễn Quang Lương** | **Tối ưu tốc độ tìm kiếm & Kiểm thử dữ liệu** — 500.000 dữ liệu mẫu, Index & đo benchmark `COLLSCAN` vs `IXSCAN` |
+| 5 | **Vũ Quốc Doanh** | **Kết nối dữ liệu & Giao diện chạy thử** — Hàm CRUD kết nối MongoDB, giao diện Web React & chạy thử toàn bộ luồng |
 
-Xem chi tiết kế hoạch 10 tuần tại [docs/00-project-plan-and-team.md](docs/00-project-plan-and-team.md) và đặc tả yêu cầu hệ thống tại [docs/01-system-requirements-specification.md](docs/01-system-requirements-specification.md).
+Xem chi tiết phân công, tác nhân hệ thống & kế hoạch 10 tuần tại [docs/00-project-plan-and-team.md](docs/00-project-plan-and-team.md) và đặc tả yêu cầu hệ thống tại [docs/01-system-requirements-specification.md](docs/01-system-requirements-specification.md).
 
 ---
 
