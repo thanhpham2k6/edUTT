@@ -25,12 +25,11 @@
 
 | Thành phần | Công nghệ / Công cụ |
 | :--- | :--- |
-| **Hệ QTCSDL** | MongoDB 7.0 (Replica Set trên Docker Compose) |
+| **Hệ QTCSDL** | MongoDB 7.0 (Replica Set: 1 Primary, 2 Secondary qua Docker Compose) |
 | **Backend & ODM** | Node.js, Express, TypeScript, Mongoose |
-| **Frontend** | React (Vite), Axios |
+| **Frontend** | React (Vite), Axios (giao diện minh họa CSDL) |
 | **Migration & Seeding** | `migrate-mongo`, `@faker-js/faker` |
-| **Kiểm thử tự động** | Jest, Supertest |
-| **Quản lý mã nguồn** | Git, GitHub |
+| **Quản lý mã nguồn & AI** | Git, GitHub • Gemini, GPT, Claude, DeepSeek |
 
 ---
 
@@ -49,15 +48,14 @@ edUTT/
 ├── backend/                         # Mã nguồn Backend (Express + TypeScript + Mongoose)
 │   ├── migrations/                  # Các file migrate-mongo ($jsonSchema, Index)
 │   ├── scripts/                     # Script seed.ts (faker.js 500.000 bản ghi)
-│   ├── src/
-│   │   ├── config/                  # Kết nối DB, biến môi trường
-│   │   ├── models/                  # Mongoose Schemas + Hooks
-│   │   ├── middlewares/             # JWT Auth & RBAC (STUDENT, ADMIN)
-│   │   ├── services/                # Nghiệp vụ chính + Multi-document ACID Transaction
-│   │   ├── controllers/             # Xử lý HTTP Request/Response
-│   │   └── routes/                  # Định tuyến REST API
-│   └── tests/                       # Kiểm thử tự động Jest + Supertest
-├── frontend/                        # Giao diện Web React (Vite)
+│   └── src/
+│       ├── config/                  # Kết nối DB, biến môi trường
+│       ├── models/                  # Mongoose Schemas + Hooks
+│       ├── middlewares/             # JWT Auth & RBAC (STUDENT, ADMIN)
+│       ├── services/                # Nghiệp vụ chính + Multi-document ACID Transaction
+│       ├── controllers/             # Xử lý HTTP Request/Response
+│       └── routes/                  # Định tuyến REST API
+├── frontend/                        # Giao diện Web React minh họa CSDL (Vite)
 ├── docker-compose.yml               # MongoDB Replica Set 1 node (rs0 - tiết kiệm RAM)
 ├── docker-compose.cluster.yml       # MongoDB Replica Set 3 node (1 Primary, 2 Secondary)
 ├── .env.example                     # Mẫu biến môi trường
@@ -67,7 +65,7 @@ edUTT/
 
 ---
 
-## 4. Hướng dẫn thiết lập môi trường (Tuần 1)
+## 4. Hướng dẫn thiết lập môi trường MongoDB Replica Set
 
 ### Yêu cầu cài đặt trước
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) (bật WSL 2 trên Windows)

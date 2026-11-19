@@ -70,12 +70,12 @@ Ngoài lớp xác thực JWT & kiểm tra vai trò (`STUDENT` / `ADMIN`) tại t
 - **FR2.1:** Quản trị viên (`ADMIN`) thêm mới hoặc sửa mã môn, tên môn (`subject_code` duy nhất, `subject_name`, `credits`, `department`).
 - **FR2.2:** Khi tên hoặc mã môn học thay đổi, hệ thống tự động cập nhật đồng loạt mảng nhúng `subject_tags` ở toàn bộ các câu hỏi liên quan trong collection `questions` bằng lệnh `updateMany()`.
 
-### FR3 — Phân hệ Hỏi đáp học thuật (Q&A)
-- **FR3.1:** Sinh viên đăng, xem và sửa câu hỏi của chính mình gắn kèm thẻ môn học (`subject_tags`). Hệ thống tự động chuẩn hóa tiêu đề tiếng Việt sang không dấu (`search_normalized`) để hỗ trợ tìm kiếm dễ dàng.
-- **FR3.2:** Viết bình luận ngắn (`short_comments`) trực tiếp dưới câu hỏi (nhúng trong document `questions`, giới hạn độ dài ký tự và số lượng phần tử nhằm tránh phình to document).
-- **FR3.3:** Đăng câu trả lời chi tiết (`answers`) tham chiếu tới `question_id` và `author_id`; hỗ trợ phân trang và sắp xếp ưu tiên đáp án chuẩn (`is_accepted: true`) rồi đến số lượt bình chọn (`vote_count` giảm dần).
-- **FR3.4:** Bình chọn Thích (`+1`) / Không thích (`-1`) cho câu hỏi hoặc câu trả lời hữu ích. Ràng buộc: **không được tự bình chọn cho bài của chính mình** và **mỗi sinh viên chỉ được bình chọn 1 lần cho 1 bài** (chặn tuyệt đối bằng Compound Unique Index).
-- **FR3.5:** Người đặt câu hỏi tự chốt đáp án chuẩn (`Accept Answer`): đánh dấu `answers.is_accepted = true`, cập nhật `questions.is_resolved = true` và cộng `+15` điểm uy tín cho tác giả câu trả lời trong cùng một **Multi-document ACID Transaction**.
+### FR3 — Phân hệ Hỏi đáp học thuật (CRUD Q&A)
+Bao quát đầy đủ 4 nhóm thao tác dữ liệu trên collection `questions`, `answers` và mảng bình luận ngắn nhúng `short_comments`:
+- **FR3.1 — Thêm mới (Create):** Đăng câu hỏi gắn thẻ môn học (`subject_tags`) và tự sinh trường không dấu `search_normalized`; gửi câu trả lời chi tiết (`answers`) kèm mã nguồn/công thức; thêm bình luận nhanh (`short_comments`) bằng toán tử `$push` (kèm giới hạn độ dài & số phần tử để tránh phình to document).
+- **FR3.2 — Xem & Tìm kiếm (Read):** Phân trang, lọc theo mã môn / trạng thái giải đáp (`is_resolved`), tìm kiếm toàn văn tiếng Việt (có dấu/không dấu), sắp xếp câu trả lời ưu tiên đáp án chuẩn (`is_accepted: true`) và lượt bình chọn cao nhất (`vote_count` giảm dần).
+- **FR3.3 — Cập nhật (Update):** Sửa bài viết đúng tác giả, tăng lượt xem bằng toán tử `$inc`; bình chọn Upvote (`+1`) / Downvote (`-1`) (không được tự bình chọn bài của mình, chặn bình chọn trùng bằng Compound Unique Index); người hỏi tự chốt đáp án chuẩn (`is_accepted = true`, `is_resolved = true`, cộng `+15` `reputation`) đồng bộ trên nhiều bảng bằng **Multi-document ACID Transaction**.
+- **FR3.4 — Xóa & Toàn vẹn dữ liệu (Delete):** Rút bình luận ngắn bằng toán tử `$pull`; xóa dây chuyền dữ liệu liên quan (`answers`, `votes` thuộc câu hỏi bị xóa) để tránh phát sinh bản ghi mồ côi.
 
 ### FR4 — Phân hệ Lưu trữ Tri thức & Tìm kiếm (Documents & Search)
 - **FR4.1:** Sinh viên tải tài liệu học tập (`documents`) lên chia sẻ gắn với một môn học (`subject_id`); tài liệu mới ở trạng thái chờ duyệt (`pending`).

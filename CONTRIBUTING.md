@@ -17,15 +17,15 @@ Dự án áp dụng mô hình **Git Flow rút gọn** gồm 2 nhánh dài hạn 
 | `docs/<tên-tài-liệu>` | Cập nhật báo cáo, sơ đồ thiết kế, README | Tách từ `dev`, merge về `dev`. |
 
 ### Ví dụ đặt tên nhánh theo từng phân hệ
-- `feature/week1-usecase-docker-replica-set` (Phạm Văn Thanh)
-- `feature/week2-erd-6-collections` (Bùi Văn Thắng)
-- `feature/week3-collections-jsonschema` (Bùi Văn Thắng)
-- `feature/week4-crud-and-db-rbac` (Vũ Quốc Doanh & Phạm Văn Thanh)
-- `feature/week5-search-filter-sort` (Vũ Quốc Doanh)
-- `feature/week6-transaction-and-automation` (Nguyễn Hữu Trọng)
-- `feature/week7-aggregation-views` (Nguyễn Quang Lương)
-- `feature/week8-seeding-index-benchmark` (Nguyễn Quang Lương)
-- `feature/week9-backup-restore-and-ui` (Phạm Văn Thanh & Vũ Quốc Doanh)
+- `feature/week1-project-outline-and-plan` (Phạm Văn Thanh & Cả nhóm)
+- `feature/week2-usecase-and-erd-6-collections` (Phạm Văn Thanh, Bùi Văn Thắng)
+- `feature/week3-docker-collections-jsonschema` (Bùi Văn Thắng, Phạm Văn Thanh)
+- `feature/week4-crud-and-db-rbac` (Vũ Quốc Doanh, Phạm Văn Thanh)
+- `feature/week5-search-filter-sort` (Vũ Quốc Doanh, Nguyễn Quang Lương)
+- `feature/week6-transaction-and-automation` (Nguyễn Hữu Trọng, Bùi Văn Thắng)
+- `feature/week7-aggregation-views` (Nguyễn Quang Lương, Nguyễn Hữu Trọng)
+- `feature/week8-seeding-index-benchmark` (Nguyễn Quang Lương, Bùi Văn Thắng)
+- `feature/week9-backup-restore-and-ui` (Phạm Văn Thanh, Vũ Quốc Doanh)
 
 ---
 
