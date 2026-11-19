@@ -1,0 +1,101 @@
+# Cấu hình mở rộng: Cụm MongoDB Replica Set 3 node (1 Primary, 2 Secondary)
+# Dùng khi muốn demo đầy đủ mô hình phân tán 3 node:
+#   docker compose -f docker-compose.cluster.yml up -d
+# Dừng và xóa volume:
+#   docker compose -f docker-compose.cluster.yml down -v
+
+services:
+  mongo1:
+    image: mongo:7.0
+    container_name: edutt-mongo-1
+    restart: unless-stopped
+    command: ["--replSet", "rs0", "--bind_ip_all", "--port", "27017"]
+    ports:
+      - "27017:27017"
+    volumes:
+      - edutt_mongo1_data:/data/db
+      - ./backups:/backups
+    networks:
+      - edutt-net
+    healthcheck:
+      test: ["CMD", "mongosh", "--port", "27017", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+
+  mongo2:
+    image: mongo:7.0
+    container_name: edutt-mongo-2
+    restart: unless-stopped
+    command: ["--replSet", "rs0", "--bind_ip_all", "--port", "27018"]
+    ports:
+      - "27018:27018"
+    volumes:
+      - edutt_mongo2_data:/data/db
+    networks:
+      - edutt-net
+    healthcheck:
+      test: ["CMD", "mongosh", "--port", "27018", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+
+  mongo3:
+    image: mongo:7.0
+    container_name: edutt-mongo-3
+    restart: unless-stopped
+    command: ["--replSet", "rs0", "--bind_ip_all", "--port", "27019"]
+    ports:
+      - "27019:27019"
+    volumes:
+      - edutt_mongo3_data:/data/db
+    networks:
+      - edutt-net
+    healthcheck:
+      test: ["CMD", "mongosh", "--port", "27019", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+
+  mongo-init:
+    image: mongo:7.0
+    container_name: edutt-mongo-init
+    depends_on:
+      mongo1:
+        condition: service_healthy
+      mongo2:
+        condition: service_healthy
+      mongo3:
+        condition: service_healthy
+    networks:
+      - edutt-net
+    restart: "no"
+    entrypoint:
+      - bash
+      - -c
+      - |
+        mongosh --host mongo1:27017 --eval '
+          try {
+            rs.status();
+            print("Replica Set rs0 already initialized.");
+          } catch (err) {
+            rs.initiate({
+              _id: "rs0",
+              members: [
+                { _id: 0, host: "mongo1:27017", priority: 2 },
+                { _id: 1, host: "mongo2:27018", priority: 1 },
+                { _id: 2, host: "mongo3:27019", priority: 1 }
+              ]
+            });
+            print("Replica Set rs0 initialized successfully (1 Primary, 2 Secondary).");
+          }
+        '
+
+networks:
+  edutt-net:
+    driver: bridge
+
+volumes:
+  edutt_mongo1_data:
+  edutt_mongo2_data:
+  edutt_mongo3_data:
