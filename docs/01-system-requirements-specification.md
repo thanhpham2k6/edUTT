@@ -113,9 +113,42 @@ Hệ thống được thiết kế với **6 Collection chính** trong cơ sở 
 
 ---
 
-## 1.6. Luồng nghiệp vụ trọng tâm (Business Workflows)
+## 1.6. Sơ đồ Use Case & Luồng nghiệp vụ trọng tâm
 
-### 1.6.1. Luồng Sinh viên tự chốt đáp án chuẩn (ACID Transaction)
+### 1.6.1. Sơ đồ Use Case tổng quát hệ thống edUTT
+
+```mermaid
+flowchart LR
+    SV(["Sinh viên (STUDENT)"])
+    AD(["Quản trị viên (ADMIN)"])
+
+    subgraph edUTT ["Hệ thống hỏi đáp học thuật & lưu trữ tri thức (edUTT)"]
+        UC1["UC01: Đăng ký / Đăng nhập / Xem hồ sơ & điểm uy tín"]
+        UC2["UC02: Đăng, xem, sửa câu hỏi gắn thẻ môn học"]
+        UC3["UC03: Viết bình luận ngắn & Đăng câu trả lời"]
+        UC4["UC04: Bình chọn (Upvote/Downvote) & Tự chốt đáp án chuẩn"]
+        UC5["UC05: Tải tài liệu lên & Tìm kiếm toàn văn, lọc theo môn"]
+        UC6["UC06: Xem bảng xếp hạng Top 10 & Thống kê tỷ lệ giải đáp"]
+        UC7["UC07: Quản lý danh mục môn học (Thêm/Sửa + Đồng bộ tag)"]
+        UC8["UC08: Kiểm duyệt tài liệu (Duyệt / Từ chối)"]
+        UC9["UC09: Quản lý tài khoản (Khóa / Mở khóa tài khoản vi phạm)"]
+    end
+
+    SV --> UC1
+    SV --> UC2
+    SV --> UC3
+    SV --> UC4
+    SV --> UC5
+    SV --> UC6
+
+    AD --> UC1
+    AD --> UC6
+    AD --> UC7
+    AD --> UC8
+    AD --> UC9
+```
+
+### 1.6.2. Luồng Sinh viên tự chốt đáp án chuẩn (ACID Transaction)
 
 ```mermaid
 sequenceDiagram
@@ -124,7 +157,7 @@ sequenceDiagram
     participant TX as MongoDB ACID Transaction (rs0)
 
     SV->>API: POST /api/answers/:id/accept (JWT - STUDENT)
-    API->>API: Kiểm tra JWT & xác minh đúng chủ câu hỏi (không tự chốt nếu không hợp lệ)
+    API->>API: Kiểm tra JWT & xác minh đúng chủ câu hỏi
     API->>TX: session.startTransaction()
     TX->>TX: 1. Cập nhật answers.is_accepted = true
     TX->>TX: 2. Cập nhật questions.is_resolved = true
@@ -138,7 +171,7 @@ sequenceDiagram
     end
 ```
 
-### 1.6.2. Luồng Tải lên & Kiểm duyệt Tài liệu (Mongoose Hook)
+### 1.6.3. Luồng Tải lên & Kiểm duyệt Tài liệu (Tự động cộng điểm uy tín)
 
 ```mermaid
 flowchart LR
@@ -148,6 +181,15 @@ flowchart LR
     C -- "Chấp nhận" --> E["Cập nhật status: approved"]
     E --> F["Cơ chế tự động cộng +10 reputation cho sinh viên đóng góp"]
     F --> G["Tài liệu hiển thị công khai & cập nhật View thống kê"]
+```
+
+### 1.6.4. Luồng Quản trị viên sửa tên môn học (Đồng bộ dữ liệu nhúng)
+
+```mermaid
+flowchart LR
+    A["Quản trị viên (ADMIN) sửa tên/mã môn học"] --> B["Cập nhật document trong collection subjects"]
+    B --> C["Chạy updateMany() đồng bộ mảng nhúng subject_tags trên collection questions"]
+    C --> D["Toàn bộ câu hỏi gắn môn học đó hiển thị tên môn mới nhất quán"]
 ```
 
 ---

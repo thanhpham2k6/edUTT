@@ -117,11 +117,11 @@ Kết quả hiển thị `state: 'PRIMARY'` là môi trường đã sẵn sàng.
 
 | STT | Họ và tên | Vai trò phụ trách (Trọng tâm CSDL) |
 | :-: | :--- | :--- |
-| 1 | **Phạm Văn Thanh** | **Nhóm trưởng** — Cài đặt CSDL (Docker), Phân quyền (`edutt_app_rw`, `edutt_report_ro`) & Sao lưu/Phục hồi |
-| 2 | **Bùi Văn Thắng** | **Thiết kế cấu trúc CSDL & Xử lý giao dịch** — Sơ đồ 6 Collection, `$jsonSchema` & ACID Transaction |
-| 3 | **Nguyễn Hữu Trọng** | **Truy vấn thống kê & Tự động hóa CSDL** — 2 bảng Views, chuẩn hóa tiếng Việt không dấu, Hook uy tín & đồng bộ tên môn |
-| 4 | **Nguyễn Quang Lương** | **Tối ưu tốc độ tìm kiếm & Kiểm thử dữ liệu** — 500.000 dữ liệu mẫu, Index & đo benchmark `COLLSCAN` vs `IXSCAN` |
-| 5 | **Vũ Quốc Doanh** | **Kết nối dữ liệu & Giao diện chạy thử** — Hàm CRUD kết nối MongoDB, giao diện Web React & chạy thử toàn bộ luồng |
+| 1 | **Phạm Văn Thanh** | **Nhóm trưởng** — Phân tích sơ đồ (Use Case, nghiệp vụ), Hạ tầng Docker, Phân quyền CSDL & Sao lưu/Phục hồi |
+| 2 | **Bùi Văn Thắng** | **Thiết kế sơ đồ CSDL & Ràng buộc dữ liệu** — Sơ đồ 6 Collection, Embedding/Referencing & `$jsonSchema` |
+| 3 | **Nguyễn Hữu Trọng** | **Nghiệp vụ giao dịch & Tự động hóa CSDL** — ACID Transaction, chuẩn hóa tiếng Việt không dấu, Hook uy tín & đồng bộ tên môn |
+| 4 | **Nguyễn Quang Lương** | **Nghiệp vụ thống kê & Tối ưu tốc độ CSDL** — 2 bảng Views, 500.000 dữ liệu mẫu, Index & đo benchmark |
+| 5 | **Vũ Quốc Doanh** | **Nghiệp vụ truy xuất dữ liệu & Giao diện minh họa** — CRUD các phân hệ, tìm kiếm/lọc & giao diện Web React |
 
 Xem chi tiết phân công, tác nhân hệ thống & kế hoạch 10 tuần tại [docs/00-project-plan-and-team.md](docs/00-project-plan-and-team.md) và đặc tả yêu cầu hệ thống tại [docs/01-system-requirements-specification.md](docs/01-system-requirements-specification.md).
 
